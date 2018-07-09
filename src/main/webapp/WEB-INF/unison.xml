@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tremoloConfig xmlns="http://www.tremolosecurity.com/tremoloConfig" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.tremolosecurity.com/tremoloConfig tremoloConfig.xsd" ldapRoot="o=Tremolo" groupObjectClass="groupOfNames" groupMemberAttribute="member" userObjectClass="inetOrgPerson">
+  <applications openSessionCookieName="openSession" openSessionTimeout="9000">
+    @[dir:applications]
+  </applications>
+  <myvdConfig>WEB-INF/myvd.conf</myvdConfig>
+  <authMechs>
+    @[dir:auth_mechs]
+  </authMechs>
+  <authChains>
+    @[dir:auth_chains]
+  </authChains>
+  <resultGroups>
+    @[dir:result_groups]
+  </resultGroups>
+  <keyStorePath>/etc/openunison/unisonKeyStore.p12</keyStorePath>
+  <keyStorePassword>#[unisonKeystorePassword]</keyStorePassword>
+  <provisioning>
+    <targets>
+      @[dir:targets]
+    </targets>
+    <workflows>
+      @[dir:workflows]
+    </workflows>
+    <approvalDB>
+          <hibernateDialect>#[OU_HIBERNATE_DIALECT]</hibernateDialect>
+          <driver>#[OU_JDBC_DRIVER]</driver>
+          <url>#[OU_JDBC_URL]</url>
+          <user>#[OU_JDBC_USER]</user>
+          <password>#[OU_JDBC_PASSWORD]</password>
+          <maxConns>10</maxConns>
+          <maxIdleConns>10</maxIdleConns>
+          <!-- <hibernateProperty name="hibernate.default_schema" value="public" /> -->
+          <userIdAttribute>uid</userIdAttribute>
+          <approverAttributes>
+            <value>givenName</value>
+            <value>sn</value>
+            <value>mail</value>
+            <value>uid</value>
+          </approverAttributes>
+          <userAttributes>
+            <value>givenName</value>
+            <value>sn</value>
+            <value>mail</value>
+            <value>uid</value>
+          </userAttributes>
+          <enabled>true</enabled>
+          <smtpHost>#[SMTP_HOST]</smtpHost>
+          <smtpPort>#[SMTP_PORT]</smtpPort>
+          <smtpUser>#[SMTP_USER]</smtpUser>
+          <smtpPassword>#[SMTP_PASSWORD]</smtpPassword>
+          <smtpSubject>Awaiting Approvals</smtpSubject>
+          <smtpFrom>#[SMTP_FROM]</smtpFrom>
+          <smtpTLS>#[SMTP_TLS]</smtpTLS>
+          <encryptionKey>session-unison</encryptionKey>
+          <smtpUseSOCKSProxy>false</smtpUseSOCKSProxy>
+          <smtpSOCKSProxyHost>
+          </smtpSOCKSProxyHost>
+          <smtpSOCKSProxyPort>0</smtpSOCKSProxyPort>
+          <smtpLocalhost>localhost</smtpLocalhost>
+          <validationQuery>#[OU_JDBC_VALIDATION]</validationQuery>
+        </approvalDB>
+        <org name="MyOrg" description="MyOrg Enterprise Applications" uuid="687da09f-8ec1-48ac-b035-f2f182b9bd1e">
+          <orgs name="Audit Reports" description="Reports for auditors" uuid="fc8799cf-b947-4626-94bd-1ddda226bc16">
+            <azRules>
+              <rule scope="group" constraint="#[OU_AUDITOR_GROUP]"/>
+            </azRules>
+          </orgs>
+        </org>
+        <queueConfig isUseInternalQueue="true" maxProducers="5"  maxConsumers="5" taskQueueName="TremoloUnisonTaskQueue" smtpQueueName="TremoloUnisonSMTPQueue" encryptionKeyName="session-unison">
+        </queueConfig>
+        <portal>
+        </portal>
+        <scheduler useDB="false" threadCount="3" instanceLabel="testing" instanceIPMask="127">
+          <job className="com.tremolosecurity.provisioning.scheduler.jobs.UpdateApprovalAz" name="resetAllowedApprovers" group="testing">
+            <!-- When to run the job -->
+            <cronSchedule
+                    seconds="0"
+                    minutes="*"
+                    hours="*"
+                    dayOfMonth="*"
+                    month="*"
+                    dayOfWeek="?"
+                    year="*"
+                    />
+            <!-- The name of the queue the Update Approvals Authorizations message listener is configured on      -->
+            <param name="queueName" value="rebaseQueue" />
+          </job>
+          <job className="com.tremolosecurity.provisioning.scheduler.jobs.RemindApprovers" name="remindAppovers" group="testing">
+            <!-- When to run the job -->
+                  <cronSchedule
+                          seconds="0"
+                          minutes="0"
+                          hours="9"
+                          dayOfMonth="*"
+                          month="*"
+                          dayOfWeek="?"
+                          year="*"
+                  />
+
+            <!-- The template for the message to send to the approvers. Use %L to represent the label of the workflow that is open and %D to represent the number of days open    -->
+            <param name="message" value="The request %L has been open for %D days, please login to act on this request" />
+            <!-- The number of days an approval request should be open before sending a reminder  -->
+            <param name="days" value="7" />
+            <!-- The name of the attribute that has the user's email address      -->
+            <param name="mailAttributeName" value="mail" />
+          </job>
+        </scheduler>
+        <listeners>
+          <!-- queueName - The name of the queue to listen to -->
+          <listener className="com.tremolosecurity.provisioning.listeners.UpdateApprovalAZListener" queueName="rebaseQueue"></listener>
+        </listeners>
+        <reports>
+        @[dir:reports]
+      </reports>
+    </provisioning>
+    </tremoloConfig>

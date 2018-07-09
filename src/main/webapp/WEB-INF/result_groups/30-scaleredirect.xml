@@ -1,0 +1,7 @@
+<resultGroup name="scaleRedirect">
+      <result>
+        <type>redirect</type>
+        <source>static</source>
+        <value>/scale/index.html</value>
+      </result>
+    </resultGroup>

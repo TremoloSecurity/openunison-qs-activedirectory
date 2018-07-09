@@ -1,0 +1,35 @@
+<target name="activedirectory" className="com.tremolosecurity.provisioning.core.providers.ADProvider">
+  <params>
+    <!-- Host for the ldap server   -->
+    <param name="host" value="#[AD_HOST]"/>
+    <!-- The port to connect to -->
+    <param name="port" value="#[AD_PORT]"/>
+    <!-- A DN for a user with administrator rights to create and update accounts        -->
+    <param name="adminDN" value="#[AD_BIND_DN]"/>
+    <!-- Credential passwords   -->
+    <param name="adminPasswd" value="#[AD_BIND_PASSWORD]"/>
+    <!-- The DN pattern for new users with user attributes in ${}       -->
+    <param name="dnPattern" value="cn=${cn},#[AD_BASE_DN]"/>
+    <!-- The base that should be used for searching for users and groups        -->
+    <param name="searchBase" value="#[AD_BASE_DN]"/>
+    <!-- The name of the attribute used to identify the user    -->
+    <param name="userIDAttribute" value="samAccountName"/>
+    <!-- If set to true SSL is used for the connection  -->
+    <param name="useSSL" value="true"/>
+    <!-- Maximum number of connections to the directory -->
+    <param name="maxCons" value="10"/>
+    <!-- Maximum number of individual operations per connection -->
+    <param name="threadsPerCons" value="10"/>
+    <!-- If set to true a shadow account is created. A shadow account is just like a regular account except the password is randomly generated. -->
+    <param name="createShadowAccount" value="false"/>
+    <!-- Millisconds an idle connection can stay open -->
+    <param name="idleTimeout" value="90000" />
+    <!-- Allow for users from outside the directory to be provisioned into directory groups -->
+    <param name="allowExternalUsers" value="false" />
+  </params>
+  <targetAttribute name="uid" source="uid" sourceType="user"/>
+  <targetAttribute name="givenName" source="givenName" sourceType="user"/>
+  <targetAttribute name="sn" source="sn" sourceType="user"/>
+  <targetAttribute name="mail" source="mail" sourceType="user"/>
+  <targetAttribute name="displayName" source="displayName" sourceType="user"/>
+</target>

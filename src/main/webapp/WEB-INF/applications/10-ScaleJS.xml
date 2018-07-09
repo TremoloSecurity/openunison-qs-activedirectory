@@ -1,0 +1,340 @@
+<application name="ScaleJS" azTimeoutMillis="30000" >
+      <urls>
+        <!-- The regex attribute defines if the proxyTo tag should be interpreted with a regex or not -->
+        <!-- The authChain attribute should be the name of an authChain -->
+        <url regex="false" authChain="loginForm" overrideHost="true" overrideReferer="true">
+          <!-- Any number of host tags may be specified to allow for an application to work on multiple hosts.  Additionally an asterick (*) can be specified to make this URL available for ALL hosts -->
+          <host>#[OU_HOST]</host>
+          <!-- The filterChain allows for transformations of the request such as manipulating attributes and injecting headers -->
+          <filterChain>
+            <filter class="com.tremolosecurity.prelude.filters.StopProcessing" />
+          </filterChain>
+          <!-- The URI (aka path) of this URL -->
+          <uri>/</uri>
+          <!-- List the various results that should happen -->
+          <results>
+            <azSuccess>scaleRedirect</azSuccess>
+            <auFail>noauaz</auFail>
+            <azFail>noauaz</azFail>
+          </results>
+          <!-- Determine if the currently logged in user may access the resource.  If ANY rule succeeds, the authorization succeeds.
+          The scope may be one of group, dn, filter, dynamicGroup or custom
+          The constraint identifies what needs to be satisfied for the authorization to pass and is dependent on the scope:
+            * group - The DN of the group in OpenUnison's virtual directory (must be an instance of groupOfUniqueNames)
+            * dn - The base DN of the user or users in OpenUnison's virtual directory
+            * dynamicGroup - The DN of the dynamic group in OpenUnison's virtual directory (must be an instance of groupOfUrls)
+            * custom - An implementation of com.tremolosecurity.proxy.az.CustomAuthorization -->
+          <azRules>
+            <rule scope="dn" constraint="o=Tremolo" />
+          </azRules>
+        </url>
+        <url regex="false" authChain="loginForm" overrideHost="true" overrideReferer="true">
+          <!-- Any number of host tags may be specified to allow for an application to work on multiple hosts.  Additionally an asterick (*) can be specified to make this URL available for ALL hosts -->
+          <host>#[OU_HOST]</host>
+          <!-- The filterChain allows for transformations of the request such as manipulating attributes and injecting headers -->
+          <filterChain>
+            <filter class="com.tremolosecurity.prelude.filters.StopProcessing" />
+          </filterChain>
+          <!-- The URI (aka path) of this URL -->
+          <uri>/logout</uri>
+          <!-- Tells OpenUnison how to reach the downstream application.  The ${} lets you set any request variable into the URI, but most of the time ${fullURI} is sufficient -->
+          <proxyTo>http://dnm${fullURI}</proxyTo>
+          <!-- List the various results that should happen -->
+          <results>
+            <azSuccess>Logout</azSuccess>
+          </results>
+          <!-- Determine if the currently logged in user may access the resource.  If ANY rule succeeds, the authorization succeeds.
+                    The scope may be one of group, dn, filter, dynamicGroup or custom
+                    The constraint identifies what needs to be satisfied for the authorization to pass and is dependent on the scope:
+                      * group - The DN of the group in OpenUnison's virtual directory (must be an instance of groupOfUniqueNames)
+                      * dn - The base DN of the user or users in OpenUnison's virtual directory
+                      * dynamicGroup - The DN of the dynamic group in OpenUnison's virtual directory (must be an instance of groupOfUrls)
+                      * custom - An implementation of com.tremolosecurity.proxy.az.CustomAuthorization -->
+          <azRules>
+            <rule scope="dn" constraint="o=Tremolo" />
+          </azRules>
+        </url>
+        <url regex="false" authChain="loginForm" overrideHost="true" overrideReferer="true">
+          <host>#[OU_HOST]</host>
+          <filterChain>
+            <filter class="com.tremolosecurity.proxy.filters.RemovePrefix">
+              <param name="prefix" value="/scale"/>
+              <param name="attributeName" value="trimmedURI"/>
+            </filter>
+          </filterChain>
+          <uri>/scale</uri>
+          <proxyTo>https://cdn.rawgit.com/TremoloSecurity/OpenUnison/1.0.15/unison/unison-scalejs-main/src/main/html${trimmedURI}</proxyTo>
+          <results>
+            <auFail>noauaz</auFail>
+            <azFail>noauaz</azFail>
+          </results>
+          <azRules>
+            <rule scope="dn" constraint="o=Tremolo" />
+          </azRules>
+        </url>
+        <url regex="false" authChain="loginForm" overrideHost="true" overrideReferer="true">
+          <host>#[OU_HOST]</host>
+          <filterChain>
+            <filter class="com.tremolosecurity.scalejs.ws.ScaleMain">
+              <!-- The name of the attribute that stores the value to be displayed when referencing the currently logged in user, ie cn or displayName -->
+              <param name="displayNameAttribute" value="displayName"/>
+              <!-- The title to show on the home page -->
+              <param name="frontPage.title" value="FreeIPA Self Service Portal"/>
+              <!-- Sub text for the home page -->
+              <param name="frontPage.text" value="Use this portal for requesting and approving access to resources protected by FreeIPA"/>
+              <!-- Determines if a user can be edited -->
+              <param name="canEditUser" value="true"/>
+              <!-- The name of the workflow to run when a user submits an update request -->
+              <param name="workflowName" value="ipa-user-update"/>
+              <!-- When the below number of minutes are left in the user's session, warn the user -->
+              <param name="warnMinutesLeft" value="5" />
+              <!-- For each attribute, define an attributeNames, displayName, readOnly -->
+              <param name="attributeNames" value="uid"/>
+              <param name="uid.displayName" value="Login ID"/>
+              <param name="uid.readOnly" value="true"/>
+              <param name="attributeNames" value="displayName"/>
+              <param name="displayName.displayName" value="Display Name"/>
+              <param name="displayName.readOnly" value="false"/>
+              <param name="displayName.required" value="true"/>
+              <param name="attributeNames" value="givenName"/>
+              <param name="givenName.displayName" value="First Name"/>
+              <param name="givenName.readOnly" value="false"/>
+              <param name="givenName.required" value="true"/>
+              <param name="attributeNames" value="sn"/>
+              <param name="sn.displayName" value="Last Name"/>
+              <param name="sn.readOnly" value="false"/>
+              <param name="sn.required" value="true"/>
+              <param name="attributeNames" value="mail"/>
+              <param name="mail.displayName" value="Email Address"/>
+              <param name="mail.readOnly" value="false"/>
+              <param name="mail.required" value="true"/>
+              <param name="attributeNames" value="loginShell"/>
+              <param name="loginShell.displayName" value="Lofin Shell"/>
+              <param name="loginShell.readOnly" value="false"/>
+              <param name="loginShell.required" value="true"/>
+              <param name="attributeNames" value="ipaSshPubKey"/>
+              <param name="ipaSshPubKey.displayName" value="SSH Public Key"/>
+              <param name="ipaSshPubKey.readOnly" value="false"/>
+              <param name="ipaSshPubKey.required" value="true"/>
+              <!-- The name of the attribute that identifies the user uniquely -->
+              <param name="uidAttributeName" value="uid"/>
+              <!-- An attribute that specifies which roles a user is a member of.  If left blank, then the user's DN in the virtual directory is compared against memberOf attributes -->
+              <param name="roleAttribute" value=""/>
+              <!-- List of attributes to include in the approval screen -->
+              <param name="approvalAttributeNames" value="uid"/>
+              <param name="approvalAttributeNames" value="givenName"/>
+              <param name="approvalAttributeNames" value="sn"/>
+              <param name="approvalAttributeNames" value="mail"/>
+              <param name="approvalAttributeNames" value="displayName"/>
+              <!-- Labels for each of the attributes -->
+              <param name="approvals.uid" value="Login ID"/>
+              <param name="approvals.givenName" value="First Name"/>
+              <param name="approvals.sn" value="Last Name"/>
+              <param name="approvals.mail" value="Email Address"/>
+              <param name="approvals.displayName" value="Display Name"/>
+              <!-- If set to true, the organization tree is shown on the main page, helpful when there are numerous links to organize them by organization -->
+              <param name="showPortalOrgs" value="false"/>
+              <!-- The URL to redirect the user to when they logout -->
+              <param name="logoutURL" value="/logout"/>
+              <!-- Optional class that can make dynamic decisions about editing the user's profile, must implement com.tremolosecurity.scalejs.sdk.UiDecisions -->
+              <param name="uiHelperClassName" value=""/>
+            </filter>
+          </filterChain>
+          <uri>/scale/main</uri>
+          <results>
+            <auFail>noauaz</auFail>
+            <azFail>noauaz</azFail>
+          </results>
+          <azRules>
+            <rule scope="dn" constraint="o=Tremolo" />
+          </azRules>
+        </url>
+        <url regex="false" authChain="resetPassword" overrideHost="true" overrideReferer="true">
+          <host>#[OU_HOST]</host>
+          <filterChain>
+            <filter class="com.tremolosecurity.proxy.filters.RemovePrefix">
+              <param name="prefix" value="/scale-reset"/>
+              <param name="attributeName" value="trimmedURI"/>
+            </filter>
+          </filterChain>
+          <uri>/scale-reset</uri>
+          <proxyTo>https://cdn.rawgit.com/TremoloSecurity/OpenUnison/1.0.15/unison/unison-scalejs-password/src/main/html${trimmedURI}</proxyTo>
+          <results>
+            <auFail>noauaz</auFail>
+            <azFail>noauaz</azFail>
+          </results>
+          <azRules>
+            <rule scope="dn" constraint="o=Tremolo" />
+          </azRules>
+        </url>
+        <url regex="false" authChain="resetPassword" overrideHost="true" overrideReferer="true">
+          <host>#[OU_HOST]</host>
+          <filterChain>
+            <filter class="com.tremolosecurity.scalejs.password.ws.ScalePassword">
+              <!-- The name of the attribute that stores the value to be displayed when referencing the currently logged in user, ie cn or displayName -->
+              <param name="displayNameAttribute" value="displayName"/>
+              <!-- The title to show on the home page -->
+              <param name="frontPage.title" value="FreeIPA Password Reset"/>
+              <!-- Sub text for the home page -->
+              <param name="frontPage.text" value="Please enter your new password.  Your password must have an upper case, lower case, numeric and special character.  The password must be at least 8 characters long and not longer then 20.  Also, 3 consecutive characters from your first name, last name or user id can not appear in it."/>
+              <!-- The URL to access ScaleMain -->
+              <param name="homeURL" value="/scale/index.html"/>
+              <!-- The URL to redirect the user to when they logout -->
+              <param name="logoutURL" value="/logout"/>
+              <!-- The name of the attribute that identifies the user uniquely -->
+              <param name="uidAttributeName" value="uid"/>
+              <!-- Reason for the workflow -->
+              <param name="reason" value="Password reset"/>
+              <!-- Workflow for the password reset call -->
+              <param name="workflowName" value="ipa-password-self-reset"/>
+              <!-- Implementation of com.tremolosecurity.scalejs.password.sdk.PasswordValidator -->
+              <param name="validatorClassName" value="com.tremolosecurity.scalejs.password.validators.ActiveDirectoryValidator"/>
+              <!-- List of parameters for the validator -->
+              <param name="validator.params" value="requireLower=true"/>
+              <param name="validator.params" value="requireUpper=true"/>
+              <param name="validator.params" value="requireNumber=true"/>
+              <param name="validator.params" value="requireSpecial=true"/>
+              <param name="validator.params" value="minRequirements=4"/>
+              <param name="validator.params" value="maxChars=20"/>
+              <param name="validator.params" value="minChars=8"/>
+              <param name="validator.params" value="attributesToCheck=Last Name=sn"/>
+              <param name="validator.params" value="attributesToCheck=User Name=uid"/>
+              <param name="validator.params" value="attributesToCheck=First Name=givenName"/>
+            </filter>
+          </filterChain>
+          <uri>/scale-reset/password</uri>
+          <results>
+            <auFail>noauaz</auFail>
+            <azFail>noauaz</azFail>
+          </results>
+          <azRules>
+            <rule scope="dn" constraint="o=Tremolo" />
+          </azRules>
+        </url>
+        <url regex="false" authChain="anon" overrideHost="true" overrideReferer="true">
+          <host>#[OU_HOST]</host>
+          <filterChain>
+            <filter class="com.tremolosecurity.proxy.filters.RemovePrefix">
+              <param name="prefix" value="/scale-register"/>
+              <param name="attributeName" value="trimmedURI"/>
+            </filter>
+          </filterChain>
+          <uri>/scale-register</uri>
+          <proxyTo>https://cdn.rawgit.com/TremoloSecurity/OpenUnison/1.0.15/unison/unison-scalejs-register/src/main/html${trimmedURI}</proxyTo>
+          <results>
+            <auFail>noauaz</auFail>
+            <azFail>noauaz</azFail>
+          </results>
+          <azRules>
+            <rule scope="dn" constraint="o=Tremolo" />
+          </azRules>
+        </url>
+        <url regex="false" authChain="anon" overrideHost="true" overrideReferer="true">
+          <host>#[OU_HOST]</host>
+          <filterChain>
+            <filter class="com.tremolosecurity.scalejs.register.ws.ScaleRegister">
+              <!-- The name of the attribute that stores the value to be displayed when referencing the currently logged in user, ie cn or displayName -->
+              <param name="displayNameAttribute" value=""/>
+              <!-- The name of the attribute that identifies the user uniquely -->
+              <param name="uidAttributeName" value="uid"/>
+              <!-- If a custom submission class isn't used, the workflow to execute -->
+              <param name="workflowName" value="ipa-user-selfregistration"/>
+              <!-- The URL to redirect the user to when they logout -->
+              <param name="logoutURL" value="/logout"/>
+              <!-- The title to show on the home page -->
+              <param name="frontPage.title" value="Register an account in FreeIPA"/>
+              <!-- Sub text for the home page -->
+              <param name="frontPage.text" value="Provide your information below to register your account"/>
+              <!-- Set to true if the password should be pre-set, should NOT be used for anonymous access -->
+              <param name="preSetPassword" value="false"/>
+              <!-- If set to true, the user must suply a reason for the reuest -->
+              <param name="requireReason" value="false"/>
+              <!-- If set to true, a recaptcha is required, registration at https://www.google.com/recaptcha/intro/index.html required -->
+              <param name="requireReCaptcha" value="true"/>
+              <!-- Site key for Google ReCaptcha -->
+              <param name="rcSiteKey" value="#[GOOGLE_CAPTCHA_SITE_KEY]"/>
+              <!-- Secret key for Google ReCaptcha -->
+              <param name="rcSecret" value="#[GOOGLE_CAPTCHA_SECRET]"/>
+              <!-- Set to true if the user must accept terms and conditions -->
+              <param name="requireTermsAndConditions" value="false"/>
+              <!-- Terms and conditions text, rendered as HTML -->
+              <param name="termsAndConditionsText" value=""/>
+              <!-- Set to true if a custom class, implementing com.tremolosecurity.scalejs.register.sdk.CreateRegisterUser -->
+              <param name="useCallWorkflowClass" value="false"/>
+              <!-- for each attribute, have an attributeNames as the name of the attribute -->
+              <param name="attributeNames" value="uid"/>
+              <!-- how to display the attribute -->
+              <param name="uid.displayName" value="Login ID"/>
+              <!-- The message to show if the regular expression fails -->
+              <param name="uid.regExFailedMsg" value="Invalid login id"/>
+              <param name="uid.regEx" value=".*" />
+              <!-- Minimum number of characters -->
+              <param name="uid.minChars" value="0"/>
+              <!-- Maximum number of characters (0 for unlimited) -->
+              <param name="uid.maxChars" value="0"/>
+              <!-- Set to true if this value must be unique in the virtual directory -->
+              <param name="uid.unique" value="true"/>
+              <!-- May be text or list -->
+              <param name="uid.type" value="text"/>
+              <param name="attributeNames" value="givenName"/>
+              <param name="givenName.displayName" value="First Name"/>
+              <param name="givenName.regExFailedMsg" value="Invalid first name"/>
+              <param name="givenName.regEx" value=".*" />
+              <param name="givenName.minChars" value="0"/>
+              <param name="givenName.maxChars" value="0"/>
+              <param name="givenName.unique" value="false"/>
+              <param name="givenName.type" value="text"/>
+              <param name="attributeNames" value="sn"/>
+              <param name="sn.displayName" value="Last Name"/>
+              <param name="sn.regExFailedMsg" value="Invalid last name"/>
+              <param name="sn.regEx" value=".*" />
+              <param name="sn.minChars" value="0"/>
+              <param name="sn.maxChars" value="0"/>
+              <param name="sn.unique" value="false"/>
+              <param name="sn.type" value="text"/>
+              <param name="attributeNames" value="mail"/>
+              <param name="mail.displayName" value="Email Address"/>
+              <param name="mail.regExFailedMsg" value="Invalid email address"/>
+              <param name="mail.regEx" value=".*@.*" />
+              <param name="mail.minChars" value="0"/>
+              <param name="mail.maxChars" value="0"/>
+              <param name="mail.unique" value="true"/>
+              <param name="mail.type" value="text"/>
+              <param name="attributeNames" value="displayName"/>
+              <param name="displayName.displayName" value="Display Name"/>
+              <param name="displayName.regExFailedMsg" value="Invalid display name"/>
+              <param name="displayName.regEx" value=".*" />
+              <param name="displayName.minChars" value="0"/>
+              <param name="displayName.maxChars" value="0"/>
+              <param name="displayName.unique" value="false"/>
+              <param name="displayName.type" value="text"/>
+            </filter>
+          </filterChain>
+          <uri>/scale-register/register</uri>
+          <results>
+            <auFail>noauaz</auFail>
+            <azFail>noauaz</azFail>
+          </results>
+          <azRules>
+            <rule scope="dn" constraint="o=Tremolo" />
+          </azRules>
+        </url>
+      </urls>
+      <!-- The cookie configuration determines how sessions are managed for this application -->
+      <cookieConfig>
+        <!-- The name of the session cookie for this application.  Applications that want SSO between them should have the same cookie name -->
+        <sessionCookieName>tremolosession</sessionCookieName>
+        <!-- The domain of component of the cookie -->
+        <domain>#[OU_HOST]</domain>
+        <!-- The URL that OpenUnison will interpret as the URL to end the session -->
+        <logoutURI>/logout</logoutURI>
+        <!-- The name of the AES-256 key in the keystore to use to encrypt this session -->
+        <keyAlias>session-unison</keyAlias>
+        <!-- If set to true, the cookie's secure flag is set to true and the browser will only send this cookie over https connections -->
+        <secure>true</secure>
+        <!-- The number of secconds that the session should be allowed to be idle before no longer being valid -->
+        <timeout>900</timeout>
+        <!-- required but ignored -->
+        <scope>-1</scope>
+      </cookieConfig>
+    </application>

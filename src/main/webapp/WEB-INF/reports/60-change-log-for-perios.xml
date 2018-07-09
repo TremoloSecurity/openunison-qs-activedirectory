@@ -1,0 +1,24 @@
+<report orgID="fc8799cf-b947-4626-94bd-1ddda226bc16" name="Change Log for Period" description="Changes to all users between the two selected dates" groupBy="id" groupings="true">
+          <paramater>beginDate</paramater>
+          <paramater>endDate</paramater>
+          <sql>select&#xD;
+          (SELECT value FROM userAttributes WHERE name='givenName' AND userid=users.id) AS `First Name`, (SELECT value FROM userAttributes WHERE name='sn' AND userid=users.id) AS `Last Name`, (SELECT value FROM userAttributes WHERE name='mail' AND userid=users.id) AS `Email Address` ,workflows.id,&#xD;
+          workflows.name as `Workflow Name`,workflows.label AS `Workflow Label`,workflows.startTS AS `Workflow Started`,workflows.completeTS AS `Workflow Completed`,workflows.requestReason AS `Request Reason`,&#xD;
+          auditLogType.name  AS `Action`,CASE WHEN isEntry = 1 THEN 'Object' ELSE 'Attribute' END AS `Target Type`,auditLogs.attribute AS `Name`,auditLogs.val AS `Value`&#xD;
+          &#xD;
+          &#xD;
+           from users inner join auditLogs on users.id=auditLogs.userid inner join auditLogType on auditLogType.id=auditLogs.actionType inner join workflows on workflows.id=auditLogs.workflow where workflows.completeTS &gt;= ? and workflows.completeTS &lt;= ?&#xD;
+           order by workflows.completeTS ASC ,workflows.id ASC , auditLogs.isEntry DESC</sql>
+          <headerFields>Workflow Name</headerFields>
+          <headerFields>Workflow Label</headerFields>
+          <headerFields>Request Reason</headerFields>
+          <headerFields>Workflow Started</headerFields>
+          <headerFields>Workflow Completed</headerFields>
+          <headerFields>First Name</headerFields>
+          <headerFields>Last Name</headerFields>
+          <headerFields>Email Address</headerFields>
+          <dataFields>Action</dataFields>
+          <dataFields>Target Type</dataFields>
+          <dataFields>Name</dataFields>
+          <dataFields>Value</dataFields>
+        </report>

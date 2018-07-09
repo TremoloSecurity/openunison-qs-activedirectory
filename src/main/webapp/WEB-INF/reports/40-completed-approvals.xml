@@ -1,0 +1,20 @@
+<report orgID="fc8799cf-b947-4626-94bd-1ddda226bc16" name="Completed Approvals" description="All approvals completed in a given set of dates" groupBy="wid" groupings="true">
+            <paramater>beginDate</paramater>
+            <paramater>endDate</paramater>
+            <sql>select &#xD;
+            workflows.id AS wid, approvals.id AS aid,approvals.label AS Approval ,approvals.createTS AS `Approval Opened`,workflows.name AS `Workflow Name`,workflows.label AS `Workflow Label`,workflows.requestReason AS `Request Reason`,&#xD;
+            concat((SELECT value FROM userAttributes WHERE name='givenName' AND userid=users.id),' ',(SELECT value FROM userAttributes WHERE name='sn' AND userid=users.id)) as `Subject Name`, (SELECT value FROM userAttributes WHERE name='mail' AND userid=users.id) as `Subject Email`,&#xD;
+            (SELECT value FROM approverAttributes WHERE name='givenName' AND approverid=approvers.id) as `First Name`,(SELECT value FROM approverAttributes WHERE name='sn' AND approverid=approvers.id) as `Last Name`,(SELECT value FROM approverAttributes WHERE name='mail' AND approverid=approvers.id) as `Email`,IF(approvals.approved = 1, 'Approved', 'Rejected') AS `Approval Result`,approvals.approvedTS AS `Approved Date`,approvals.reason AS Reason&#xD;
+            from approvals inner join approvers on approvals.approver=approvers.id inner join workflows on workflows.id=approvals.workflow inner join users on users.id=workflows.userid WHERE approvals.approvedTS &gt;= ? AND approvals.approvedTS &lt;= ? order by approvals.id ASC,workflows.id ASC;&#xD;
+          </sql>
+          <headerFields>Workflow Name</headerFields>
+          <headerFields>Workflow Label</headerFields>
+          <headerFields>Subject Name</headerFields>
+          <headerFields>Subject Email</headerFields>
+          <headerFields>Request Reason</headerFields>
+          <dataFields>Approval</dataFields>
+          <dataFields>First Name</dataFields>
+          <dataFields>Last Name</dataFields>
+          <dataFields>Email</dataFields>
+          <dataFields>Approval Result</dataFields>
+        </report>

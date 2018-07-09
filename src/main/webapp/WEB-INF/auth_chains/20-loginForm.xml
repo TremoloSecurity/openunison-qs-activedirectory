@@ -1,0 +1,14 @@
+<chain name="loginForm" level="20">
+      <authMech>
+        <name>loginForm</name>
+        <required>required</required>
+        <params>
+          <!-- Path to the login form -->
+          <param name="FORMLOGIN_JSP" value="/auth/forms/login.jsp"/>
+          <!-- Either an attribute name OR an ldap filter mapping the form parameters. If this is an ldap filter, form parameters are identified by ${parameter} -->
+          <param name="uidAttr" value="uid"/>
+          <!-- If true, the user is determined based on an LDAP filter rather than a simple user lookup -->
+          <param name="uidIsFilter" value="false"/>
+        </params>
+      </authMech>
+    </chain>

@@ -1,0 +1,25 @@
+<workflow  name="ad-user-update" label="ACtive Directory User Self Update" description="User self update from ScaleJS" inList="false" orgid="687da09f-8ec1-48ac-b035-f2f182b9bd1e">
+        <tasks>
+          <mapping  strict="true">
+            <map>
+              <mapping targetAttributeName="uid" sourceType="user" targetAttributeSource="uid"/>
+              <mapping targetAttributeName="givenName" sourceType="user" targetAttributeSource="givenName"/>
+              <mapping targetAttributeName="sn" sourceType="user" targetAttributeSource="sn"/>
+              <mapping targetAttributeName="displayName" sourceType="user" targetAttributeSource="displayName"/>
+              <mapping targetAttributeName="mail" sourceType="user" targetAttributeSource="mail"/>
+            </map>
+            <onSuccess>
+              <customTask className="com.tremolosecurity.provisioning.customTasks.LoadGroups">
+                <param name="nameAttr" value="uid"/>
+                <param name="inverse" value="false"/>
+              </customTask>
+              <provision sync="true" target="activedirectory" setPassword="false" onlyPassedInAttributes="false" />
+              <notifyUser subject="Your profile has been updated" mailAttrib="mail">
+                <msg>
+    Your profile has been updated.  If you didn't update your profile, please contact support immediately.
+  </msg>
+              </notifyUser>
+            </onSuccess>
+          </mapping>
+        </tasks>
+      </workflow>

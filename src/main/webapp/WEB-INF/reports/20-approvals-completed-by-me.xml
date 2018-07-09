@@ -1,0 +1,12 @@
+<report orgID="687da09f-8ec1-48ac-b035-f2f182b9bd1e" name="Approvals Completed by Me" description="All approvals you approved or denied" groupBy="wid" groupings="false">
+            <paramater>currentUser</paramater>
+            <sql>select  workflows.id AS wid, approvals.id AS aid,approvals.label AS Approval ,approvals.createTS AS `Approval Opened`,workflows.name AS `Workflow Name`,workflows.label AS `Workflow Label`,workflows.requestReason AS `Request Reason`, concat((SELECT value FROM userAttributes WHERE name='givenName' AND userid=users.id),' ',(SELECT value FROM userAttributes WHERE name='sn' AND userid=users.id)) as `Subject Name`, (SELECT value FROM userAttributes WHERE name='mail' AND userid=users.id) as `Subject Email`, (SELECT value FROM approverAttributes WHERE name='givenName' AND approverid=approvers.id) as `First Name`,(SELECT value FROM approverAttributes WHERE name='sn' AND approverid=approvers.id) as `Last Name`,(SELECT value FROM approverAttributes WHERE name='mail' AND approverid=approvers.id) as `Email`,IF(approvals.approved = 1, 'Approved', 'Rejected') AS `Approval Result`,approvals.approvedTS AS `Approved Date`,approvals.reason AS Reason from approvals inner join approvers on approvals.approver=approvers.id inner join workflows on workflows.id=approvals.workflow inner join users on users.id=workflows.userid WHERE approvers.userKey=? order by approvals.approvedTS DESC; </sql>
+            <dataFields>Workflow Name</dataFields>
+            <dataFields>Workflow Label</dataFields>
+            <dataFields>Subject Name</dataFields>
+            <dataFields>Subject Email</dataFields>
+            <dataFields>Request Reason</dataFields>
+            <dataFields>Approval</dataFields>
+            <dataFields>Approval Result</dataFields>
+            <dataFields>Approved Date</dataFields>
+          </report>

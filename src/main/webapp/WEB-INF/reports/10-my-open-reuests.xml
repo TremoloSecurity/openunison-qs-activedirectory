@@ -1,0 +1,13 @@
+<report orgID="687da09f-8ec1-48ac-b035-f2f182b9bd1e" name="My Open Requests" description="List of your currently open requests and the approvers responsible for acting on them" groupBy="id" groupings="true">
+            <paramater>currentUser</paramater>
+            <sql>select  approvals.id,approvals.label AS Approval ,approvals.createTS AS `Approval Opened`,workflows.name AS `Workflow Name`,workflows.label AS `Workflow Label`,workflows.requestReason AS `Request Reason`, concat((SELECT value FROM userAttributes WHERE userAttributes.name='givenName' AND userid=users.id),' ',(SELECT value FROM userAttributes WHERE userAttributes.name='sn' AND userid=users.id)) as `Subject Name`, (SELECT value FROM userAttributes WHERE name='mail' AND userid=users.id) as `Subject Email`, (SELECT value FROM approverAttributes WHERE name='givenName' AND approverid=approvers.id) as `First Name`,(SELECT value FROM approverAttributes WHERE name='sn' AND approverid=approvers.id) as `Last Name`,(SELECT value FROM approverAttributes WHERE name='mail' AND approverid=approvers.id) as `Email`  from approvals inner join workflows on approvals.workflow=workflows.id inner join users on workflows.userid=users.id inner join allowedApprovers on approvals.id=allowedApprovers.approval inner join approvers on approvers.id=allowedApprovers.approver where users.userKey=? AND approvedTS is null order by approvals.createTS ASC, approvals.id ASC</sql>
+            <headerFields>Approval</headerFields>
+            <headerFields>Subject Name</headerFields>
+            <headerFields>Subject Email</headerFields>
+            <headerFields>Workflow Name</headerFields>
+            <headerFields>Workflow Label</headerFields>
+            <headerFields>Request Reason</headerFields>
+            <dataFields>First Name</dataFields>
+            <dataFields>Last Name</dataFields>
+            <dataFields>Email</dataFields>
+          </report>

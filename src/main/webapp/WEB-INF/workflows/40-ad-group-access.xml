@@ -1,0 +1,65 @@
+<workflow  name="ad-group-access" label="Access to $groupName$" description="$descriptionAttribute$" inList="true" orgid="687da09f-8ec1-48ac-b035-f2f182b9bd1e">
+            <dynamicConfiguration dynamic="true" className="com.tremolosecurity.provisioning.dynamicwf.LDAPDynaicWorkflows" >
+              <!-- Where to start searching for groups -->
+              <param name="searchBase" value="ou=activedirectory,o=Tremolo" />
+              <!-- Filter to use when searching for groups -->
+              <param name="searchFilter" value="(&amp;(objectClass=groupOfUniqueNames)(managedBy=*))" />
+              <!-- Name of the attribute that stores the group's name, required; Exposed as groupName in the workflow -->
+              <param name="groupNameAttribute" value="cn" />
+              <!-- Name of the attribute that stores the approver for access to this group; Exposed as approver in the workflow -->
+              <param name="approverAttribute" value="managedBy" />
+              <!-- Name of the attribute that stores a description, optional; Exposed as descriptionAttribute in the workflow -->
+              <param name="descriptionAttribute" value="description" />
+            </dynamicConfiguration>
+            <tasks>
+              <customTask className="com.tremolosecurity.provisioning.customTasks.LoadGroups">
+                <param name="nameAttr" value="uid"/>
+                <param name="inverse" value="false"/>
+              </customTask>
+              <customTask className="com.tremolosecurity.provisioning.customTasks.LoadAttributes">
+                <param name="name" value="mail"/>
+                <param name="nameAttr" value="uid"/>
+              </customTask>
+              <approval label="Approve Access to Active Directory Group $groupName$">
+                <emailTemplate>You have open approvals</emailTemplate>
+                <approvers>
+                  <rule scope="group" constraint="$approver$" />
+                </approvers>
+                <onSuccess>
+                  <mapping  strict="true">
+                    <map>
+                      <mapping targetAttributeName="uid" sourceType="user" targetAttributeSource="uid"/>
+                      <mapping targetAttributeName="uid" sourceType="user" targetAttributeSource="mail"/>
+                    </map>
+                    <onSuccess>
+                      <addGroup name="$groupName$" remove="false"/>
+                      <provision sync="true" target="activedirectory" setPassword="false" onlyPassedInAttributes="true" />
+                      <notifyUser subject="Your access to $groupName$ has been granted" mailAttrib="mail">
+                        <msg>
+                                      Your access to $groupName$ has been granted
+                                    </msg>
+                        </notifyUser>
+
+                      </onSuccess>
+                    </mapping>
+                  </onSuccess>
+                  <onFailure>
+                    <mapping  strict="true">
+                      <map>
+                        <mapping targetAttributeName="uid" sourceType="user" targetAttributeSource="uid"/>
+                        <mapping targetAttributeName="uid" sourceType="user" targetAttributeSource="mail"/>
+                      </map>
+                      <onSuccess>
+                        <addGroup name="$groupName$" remove="true"/>
+                        <provision sync="true" target="activedirectory" setPassword="false" onlyPassedInAttributes="true" />
+                        <notifyUser subject="Your access to $groupName$ has been removed" mailAttrib="mail">
+                          <msg>
+                                        Your access to $groupName$ has been removed
+                                      </msg>
+                          </notifyUser>
+                        </onSuccess>
+                      </mapping>
+                    </onFailure>
+                </approval>
+              </tasks>
+            </workflow>
