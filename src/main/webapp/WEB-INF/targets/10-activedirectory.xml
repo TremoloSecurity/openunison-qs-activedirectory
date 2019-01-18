@@ -32,4 +32,5 @@
   <targetAttribute name="sn" source="sn" sourceType="user"/>
   <targetAttribute name="mail" source="mail" sourceType="user"/>
   <targetAttribute name="displayName" source="displayName" sourceType="user"/>
+  <targetAttribute name="userAccountControl" source="userAccountControl" sourceType="user" />
 </target>
